@@ -1,7 +1,3 @@
-Function AddTwoCells(cell1, cell2)
-    AddTwoCells = cell1 + cell2
-End Function
-
 Function LastRowByColumn(SelectedCell As Range)
     'TODO As Range otherwise it might thing it's a string?
     'This gives last row of selected cell or column
@@ -17,7 +13,7 @@ Function VlookupWithMessage(lookup_value, table_array, column_index, error_messa
         error_message)
 End Function
 
-Function VlookupLastColumn(lookup_value, table_array)
+Function VlookupSimple(lookup_value, table_array)
 'Vlookup that only returns an exact match, and returns value from last column
   column_index = table_array.Columns.Count
   VlookupLastColumn = Application.VLOOKUP(lookup_value, table_array, column_index, 0)
@@ -31,3 +27,11 @@ Function JoinText(InRange, Delim)
   Next Cell
   JoinText = Left(JoinText, Len(JoinText) - Len(Delim))
 End Function
+
+Sub OpenFile()
+OpenFileName = Application.GetOpenFilename
+Workbooks.Open Filename:=OpenFileName
+
+'This works too:'
+'Workbooks.Open Filename:=Application.GetOpenFilename
+End Sub
