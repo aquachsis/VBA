@@ -27,11 +27,3 @@ Function JoinText(InRange, Delim)
   Next Cell
   JoinText = Left(JoinText, Len(JoinText) - Len(Delim))
 End Function
-
-Sub OpenFile()
-OpenFileNameVariable = Application.GetOpenFilename
-Workbooks.Open Filename:=OpenFileNameVariable
-
-'This works too:'
-'Workbooks.Open Filename:=Application.GetOpenFilename
-End Sub
