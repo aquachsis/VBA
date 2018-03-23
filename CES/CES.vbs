@@ -1,13 +1,27 @@
+Sub WindowsOrMac()
+Answer = MsgBox( _
+    "Windows = Yes." & vbNewLine & "Macs = No.", _
+    vbQuestion + vbYesNo, _
+    "Are you on Windows?" _
+)
+
+If Answer = vbNo Then
+    MsgBox "This macro won't work on a Mac." & _
+        vbNewLine & vbNewLine & _
+        "Because remove duplicates in VBA won't work on Macs."
+Else
+    Call CES
+End If
+End Sub
+
+
 Sub CES()
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 'Takes the CES report from Paylocity and formats it in a way'
 'where it provides the summarized information that the BLS '
 'needs.                                                     '
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-MsgBox _
-  "Choose the CES Raw Data File" & _
-  vbNewLine & vbNewLine & _
-  "Does not work on Mac because of RemoveDuplicates"
+MsgBox "Choose the CES Raw Data File"
 
 Dim strStatisticsReportLocation As String
 strStatisticsReportLocation = Application.GetOpenFilename
@@ -29,6 +43,14 @@ Worksheets("Raw Data").Activate
 Dim lngFooterRow As Long
 lngFooterRow = ActiveSheet.Cells(Rows.Count,2).End(xlUp).Row
 Rows(lngFooterRow & ":" & Rows.Count).EntireRow.Delete
+
+'Convert Employee Number to NumberFormat
+[C:C].Select
+With Selection
+    .NumberFormat = "General"
+    .Value = .Value
+End With
+
 
 'Employee Count
 Worksheets("EE Count").Activate
@@ -90,14 +112,14 @@ Dim SummaryArray As Variant
     )
 Range("A1:F1") = SummaryArray
 Range("A2") = "All Workers"
-Range("B2").Formula = Worksheets("EE Count").Range("I2").Value
-Range("C2").Formula = Worksheets("EE Count").Range("I4").Value
-Range("D2").Formula = Worksheets("Dollar").Range("J2").Value
-Range("F2").Formula = Worksheets("Hours").Range("J2").Value
+Range("B2").Formula = "='EE Count'!I2"
+Range("C2").Formula = "='EE Count'!I4"
+Range("D2").Formula = "='Dollar'!J2"
+Range("F2").Formula = "='Hours'!J2"
 Range("A3") = "Nonsupervisory Workers"
-Range("B3").Formula = Worksheets("EE Count").Range("I3").Value
-Range("D3").Formula = Worksheets("Dollar").Range("J3").Value
-Range("F3").Formula = Worksheets("Hours").Range("J3").Value
+Range("B3").Formula = "='EE Count'!I3"
+Range("D3").Formula = "='Dollar'!J3"
+Range("F3").Formula = "='Hours'!J3"
 
 Range("A1:F3").Select
 With Selection
@@ -108,6 +130,8 @@ With Selection
 .WrapText = True
 End With
 
+'Save file
 ActiveWorkbook.Save
+MsgBox "Macro completed. Changes saved to the raw data file."
 
 End Sub
