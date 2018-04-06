@@ -1,81 +1,75 @@
 Sub BenefitPayments()
-' Keyboard Shortcut: Ctrl + D
-Application.DisplayAlerts = False
-Application.ScreenUpdating = False
-Application.EnableEvents = False
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'Takes the Total Deduction file and create an uploadable'
+'file to Salesforce for the benefit payments.           '
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-'this opens up the two files and copies them into the macro
+Dim MyWorkbookName As String
+Dim TotalDeductionsName As String
+Dim BenefitIDName As String
+Dim lngLastRow As Long
+Dim BenefitHeaders As Variant
 
-Workbooks.Open Filename:=Application.GetOpenFilename
-Windows("Benefit Payments - Report.csv").Activate
-Cells.Select
-Selection.Copy
-Windows("Benefit Payments - After - Macro.xlsm").Activate
-Sheets("Benefit Payments").Select
-Range("A1").Select
-ActiveSheet.Paste
-Windows("Benefit Payments - Report.csv").Activate
-ActiveWindow.Close
+MyWorkbookName = ActiveWorkbook.Name
 
-Workbooks.Open Filename:=ThisWorkbook.Path & "\Benefit - Election ID.csv"
-Windows("Benefit - Election ID.csv").Activate
-Cells.Select
-Selection.Copy
-Windows("Benefit Payments - After - Macro.xlsm").Activate
-Sheets("Election ID").Select
-Range("A1").Select
-ActiveSheet.Paste
-Windows("Benefit - Election ID.csv").Activate
-ActiveWindow.Close
+MsgBox "Select the Total Deductions file."
+TotalDeductionsFile = Application.GetOpenFilename
+MsgBox "Select the Benefit IDs file."
+BenefitIDFile = Application.GetOpenFilename
 
- 'start of formuals and formatting within macro
+'Copy over the Total Deductions
+Workbooks.Open Filename:= TotalDeductionsFile
+TotalDeductionsName = ActiveWorkbook.Name
+Workbooks(TotalDeductionsName).Worksheets(1).Cells.Copy Destination:= _
+    Workbooks(MyWorkbookName).Worksheets("Benefit Payments").Range("A1")
+Workbooks(TotalDeductionsName).Close SaveChanges:=False
 
-Windows("Benefit Payments - After - Macro.xlsm").Activate
-Sheets("Benefit Payments").Select
+'Copy over the Benefit IDs
+Workbooks.Open Filename:= BenefitIDFile
+BenefitIDName = ActiveWorkbook.Name
+Workbooks(BenefitIDName).Worksheets(1).Cells.Copy Destination:= _
+    Workbooks(MyWorkbookName).Worksheets("Election ID").Range("A1")
+Workbooks(BenefitIDName).Close SaveChanges:=False
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'Format Benefit Payments sheet to find just benefit codes'
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Sheets("Benefit Payments").Activate
+
+BenefitHeaders = Array( _
+    "Employee Number", _
+    "Employee", _
+    "Check Date", _
+    "Code", _
+    "Description", _
+    "Amount", _
+    "Process ID", _
+    "A Benefit Code?" _
+)
+
 Range("A1").EntireRow.Insert
+Range("A1:H1") = BenefitHeaders
 
-Dim Lastrow As Long
-Lastrow = Range("A" & Rows.Count).End(xlUp).Row
-
-Range("H2").Select
-ActiveCell.FormulaR1C1 = "=COUNTIF(BenefitList,RC[-4])"
-Range("H2").Select
-Selection.AutoFill Destination:=Range("H2:H" & Lastrow)
-Rows("1:1").Select
-Selection.AutoFilter
-ActiveSheet.Range("$A$1:H" & Lastrow).AutoFilter Field:=8, Criteria1:="1"
-
-
-
-Range("A2").Select
-Range(Selection, Selection.End(xlToRight)).Select
-Range(Selection, Selection.End(xlDown)).Select
-
-Selection.Copy
-Sheets("Upload Template").Select
-Cells.Select
-ActiveSheet.Paste
-
-
-'This defines last row for Upload Template tab
-
-Rows("1:1").Select
+lngLastRow = Range("A" & Rows.Count).End(xlUp).Row
+Range("H2:H" & lngLastRow).FormulaR1C1 = "=COUNTIF(BenefitList,RC[-4])"
+Range("$A$1:H" & lngLastRow).AutoFilter Field:=8, Criteria1:="1"
+Cells.Copy Destination:= Worksheets("Upload Template").Range("A1")
 Application.CutCopyMode = False
-Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
 
-Dim LR As Long
-LR = Range("A" & Rows.Count).End(xlUp).Row
+''''''''''''''''''''''''
+'Format Upload Template'
+''''''''''''''''''''''''
+Sheets("Upload Template").Activate
+lngLastRow = Range("A" & Rows.Count).End(xlUp).Row
 
-Columns("A:A").Select
-Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
-Range("A1").Select
-ActiveCell.FormulaR1C1 = "=CONCATENATE(RC[1],"" - "",RC[4])"
-Range("A1").Select
-Selection.AutoFill Destination:=Range("A1:A" & LR)
-Columns("A:A").Select
-Selection.Copy
-Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-    :=False, Transpose:=False
+Range("A1").EntireColumn.Insert
+Range("A1:A" & lngLastRow).FormulaR1C1 = "=CONCATENATE(RC[1],"" - "",RC[4])"
+Range("A1:A" & lngLastRow).Value = Range("A1:A" & lngLastRow).Value
+
+
+'I LEFT OFF HERE'
+
 
  'This section grab benefit election id
 Columns("A:A").Select
@@ -221,10 +215,10 @@ Dim sFilename As String
 sFilename = "Benefit Payments - Check Date " & CheckDate & " - Upload.csv"  'You can give a nem to save
 Workbooks.Add
 'Saving the Workbook
-ActiveWorkbook.SaveAs ThisWorkbook.Path & "\" & sFilename, FileFormat:=xlCSV, CreateBackup:=False
+ActiveWorkbook.SaveAs ThisWorkbook.Path & Application.PathSeparator & sFilename, FileFormat:=xlCSV, CreateBackup:=False
 
 
-Windows("Benefit Payments - After - Macro").Activate
+Workbooks(MyWorkbookName).Activate
 Sheets("Upload Template").Select
 Columns("A:E").Select
 Selection.Copy
@@ -233,9 +227,5 @@ Windows("Benefit Payments - Check Date " & CheckDate & " - Upload.csv").Activate
 Range("A1").Select
 ActiveSheet.Paste
 ActiveWorkbook.Save
-
-Application.EnableEvents = True
-Application.DisplayAlerts = True
-Application.DisplayAlerts = True
 
 End Sub
