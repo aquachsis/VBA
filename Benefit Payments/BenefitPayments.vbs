@@ -9,6 +9,10 @@ Dim TotalDeductionsName As String
 Dim BenefitIDName As String
 Dim lngLastRow As Long
 Dim BenefitHeaders As Variant
+Dim UploadHeaders As Variant
+Dim CheckDate As String
+Dim OutfileNameCSV As String
+Dim OutfileNameXLSX As String
 
 MyWorkbookName = ActiveWorkbook.Name
 
@@ -30,7 +34,6 @@ BenefitIDName = ActiveWorkbook.Name
 Workbooks(BenefitIDName).Worksheets(1).Cells.Copy Destination:= _
     Workbooks(MyWorkbookName).Worksheets("Election ID").Range("A1")
 Workbooks(BenefitIDName).Close SaveChanges:=False
-
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 'Format Benefit Payments sheet to find just benefit codes'
@@ -65,167 +68,59 @@ lngLastRow = Range("A" & Rows.Count).End(xlUp).Row
 
 Range("A1").EntireColumn.Insert
 Range("A1:A" & lngLastRow).FormulaR1C1 = "=CONCATENATE(RC[1],"" - "",RC[4])"
-Range("A1:A" & lngLastRow).Value = Range("A1:A" & lngLastRow).Value
 
+Range("A1").EntireColumn.Insert
+Range("A1") = "Benefit ID"
+Range("A2:A" & lngLastRow).FormulaR1C1 = "=IFNA(VLOOKUP(RC[1],'Election ID'!C:C[1],2,0),RC[1])"
 
-'I LEFT OFF HERE'
+Range("A1:B" & lngLastRow).Value = Range("A1:B" & lngLastRow).Value
 
-
- 'This section grab benefit election id
-Columns("A:A").Select
-Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
-Range("A2").Select
-ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[1],'Election ID'!C:C[1],2,0)"
-Range("A2").Select
-Selection.AutoFill Destination:=Range("A2:A" & LR)
-Columns("A:A").Select
-Selection.Copy
-Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-    :=False, Transpose:=False
-
- 'this section being to format the report to start creating the upload file
-Columns("H:H").Select
-Application.CutCopyMode = False
-Selection.Cut
-Columns("B:B").Select
-Selection.Insert Shift:=xlToRight
-Columns("F:F").Select
-Selection.Cut
-Columns("C:C").Select
-Selection.Insert Shift:=xlToRight
-Columns("D:D").Select
-Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
-Columns("E:E").Select
-Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
-Range("A1").Select
-ActiveCell.FormulaR1C1 = "Benefit Election"
-Range("B1").Select
-ActiveCell.FormulaR1C1 = "Amount"
-Range("C1").Select
-ActiveCell.FormulaR1C1 = "Check Date"
-Range("D1").Select
-ActiveCell.FormulaR1C1 = "Transaction Type"
-Range("E1").Select
-ActiveCell.FormulaR1C1 = "Check"
-Columns("G:G").Select
-Range(Selection, Selection.End(xlToRight)).Select
-Selection.Delete Shift:=xlToLeft
-
-'This creates the CONCATENATE and pulls records for #NA
-Range("D2").Select
-ActiveCell.FormulaR1C1 = _
-    "=CONCATENATE(""Payment through transmission check date "",TEXT(RC[-1],""mm/dd/yyyy.""))"
-Range("D2").Select
-Selection.AutoFill Destination:=Range("D2:D" & LR)
-Columns("D:D").Select
-Selection.Copy
-Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-    :=False, Transpose:=False
-Columns("A:A").Select
-Application.CutCopyMode = False
-Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
-Range("A2").Select
-ActiveCell.FormulaR1C1 = "=IF(ISNA(RC[1]),RC[6],RC[1])"
-Range("A2").Select
-Selection.AutoFill Destination:=Range("A2:A" & LR)
-Columns("A:A").Select
-Selection.Copy
-ActiveSheet.Paste
-Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-    :=False, Transpose:=False
-
-'This continue to format and includes an If statment stating that if amount is greater than 0 enter "Payment" if not enter "SIS Reimbusing Employee"
-Range("E1:F1").Select
-Range("F1").Activate
-Application.CutCopyMode = False
-Selection.ClearContents
-Range("E1").Select
-ActiveCell.FormulaR1C1 = "Check"
-Columns("E:E").Select
-Selection.Cut
-Columns("G:G").Select
-Selection.Insert Shift:=xlToRight
-Range("E1").Select
-ActiveCell.FormulaR1C1 = "Transaction Type"
-Range("E2").Select
-ActiveCell.FormulaR1C1 = _
+'Insert 5 columns for the upload file'
+Range("A1:E1").EntireColumn.Insert
+Range("A2:A" & lngLastRow).Value = Range("F2:F" & lngLastRow).Value
+Range("B2:B" & lngLastRow).Value = Range("M2:M" & lngLastRow).Value
+Range("C2:C" & lngLastRow).Value = Range("J2:J" & lngLastRow).Value
+Range("D2:D" & lngLastRow).FormulaR1C1 = _
     "=IF(RC[-2]>0,""Payment"",""SIS Reimbursing Employee"")"
-Range("E2").Select
-Selection.AutoFill Destination:=Range("E2:E" & LR)
-Columns("E:E").Select
-Selection.Copy
-ActiveSheet.Paste
-Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-    :=False, Transpose:=False
-Range("B1").Select
-Application.CutCopyMode = False
-Selection.Copy
-Range("A1").Select
-ActiveSheet.Paste
-Columns("B:B").Select
-Application.CutCopyMode = False
-Selection.Delete Shift:=xlToLeft
-Columns("F:F").Select
-Selection.Delete Shift:=xlToLeft
-Columns("A:E").Select
-Range("E1").Activate
-Selection.Columns.AutoFit
+Range("E2:E" & lngLastRow).FormulaR1C1 = _
+    "=CONCATENATE(""Payment through transmission check date "",TEXT(RC[-1],""mm/dd/yyyy.""))"
 
-Sheets("Upload Template").Select
-Range("C2").Select
-Sheets("Upload Template").Select
-Range("C2").Select
-Selection.Copy
-Sheets("Instructions").Select
-Range("F2").Select
-ActiveSheet.Paste
-Range("G2").Select
-Application.CutCopyMode = False
-ActiveCell.FormulaR1C1 = "=TEXT(RC[-1],""mmddyyyy"")"
-Range("F2:G2").Select
-Range("G2").Activate
-With Selection.Font
-    .ThemeColor = xlThemeColorDark1
-    .TintAndShade = 0
-End With
-Range("F3").Select
+UploadHeaders = Array( _
+    "Benefit Election", _
+    "Amount", _
+    "Check Date", _
+    "Transaction Type", _
+    "Check" _
+)
+
+Range("A1:E1") = UploadHeaders
+Columns("F:Z").EntireColumn.Delete
+
+Range("A1").CurrentRegion.Sort _
+    Key1:=Range("A1"), Order1:=xlAscending, _
+    Header:=xlYes
+
+Cells.EntireColumn.AutoFit
 
 
-'This sets the check date as a variable
-Dim CheckDate As Variant
-CheckDate = Range("G2")
+''''''''''''''''''''''
+'Save the upload file'
+''''''''''''''''''''''
+CheckDate = Format(Range("C2"), "mmddyyyy")
+OutfileNameCSV = "Benefit Payments - Check Date " & CheckDate & " - Upload.csv"
+OutfileNameXLSX = "Benefit Payments - Check Date " & CheckDate & ".xlsx"
+ActiveWorkbook.SaveAs _
+    ThisWorkbook.Path & _
+    Application.PathSeparator & _
+    OutfileNameCSV, _
+    FileFormat:=xlCSV, _
+    CreateBackup:=False
 
-Sheets("Upload Template").Select
-
-Columns("A:E").Select
-ActiveWorkbook.Worksheets("Upload Template").Sort.SortFields.Clear
-ActiveWorkbook.Worksheets("Upload Template").Sort.SortFields.Add _
-    Key:=Range("A2:A" & LR), SortOn:=xlSortOnValues, Order:=xlAscending, _
-    DataOption:=xlSortNormal
-With ActiveWorkbook.Worksheets("Upload Template").Sort
-    .SetRange Range("A1:E" & LR)
-    .Header = xlYes
-    .MatchCase = False
-    .Orientation = xlTopToBottom
-    .SortMethod = xlPinYin
-    .Apply
-End With
-
-Dim sFilename As String
-sFilename = "Benefit Payments - Check Date " & CheckDate & " - Upload.csv"  'You can give a nem to save
-Workbooks.Add
-'Saving the Workbook
-ActiveWorkbook.SaveAs ThisWorkbook.Path & Application.PathSeparator & sFilename, FileFormat:=xlCSV, CreateBackup:=False
-
-
-Workbooks(MyWorkbookName).Activate
-Sheets("Upload Template").Select
-Columns("A:E").Select
-Selection.Copy
-
-Windows("Benefit Payments - Check Date " & CheckDate & " - Upload.csv").Activate
-Range("A1").Select
-ActiveSheet.Paste
-ActiveWorkbook.Save
+ActiveWorkbook.SaveAs _
+    ThisWorkbook.Path & _
+    Application.PathSeparator & _
+    OutfileNameXLSX, _
+    FileFormat:=xlOpenXMLWorkbook, _
+    CreateBackup:=False
 
 End Sub
