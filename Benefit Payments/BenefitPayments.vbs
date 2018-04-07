@@ -123,4 +123,5 @@ ActiveWorkbook.SaveAs _
     FileFormat:=xlOpenXMLWorkbook, _
     CreateBackup:=False
 
+MsgBox "Macro completed. Files saved to same folder as the macro."
 End Sub
