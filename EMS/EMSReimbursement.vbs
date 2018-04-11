@@ -5,7 +5,6 @@ Public CalcFirstCell As String
 Public CalcLastCell As String
 Public CalcFormula As String
 Public UIDFormula As String
-' Public DuplicateCount As Long
 
 Sub EMS()
     Call OpenExpenseFiles()
@@ -15,7 +14,6 @@ Sub EMS()
     Call FindDuplicatesAgainstHistorical
     Call CreateSummarySheet
     Call SaveAsXLSX
-    MsgBox "Macro completed."
 End Sub
 
 Sub OpenExpenseFiles()
@@ -80,32 +78,41 @@ Sub FindDuplicatesAgainstHistorical()
     Range("A1").EntireColumn.Insert
     Call InsertCalculations("A", "UniqueID", UIDFormula)
 
-    'TODO exclude mileage'
     CalcFormula = "=IF(RC[-3]=""Mileage"","""",IFNA(VLOOKUP(RC[-9],Upcoming!C[-9]:C[-6],4,0),""""))"
     Call InsertCalculations("J", "Duplicate Reimbursement?", CalcFormula)
     Call SortForReadability
 End Sub
 
 Sub CreateSummarySheet()
+'TODO Messaging for no duplicates, historcal only, upcoming only, both'
     Sheets.Add().Name = "Summary"
 
-    'TODO only if there are duplicates'
-    'Find Last Row with Duplicates, in Upcoming Sheet
+    Range("A1") = "No Duplicates" 'this would get overriden if there were'
+
     LastRow = Worksheets("Upcoming").Cells(Rows.Count, Range("J1").Column).End(xlUp).Row
-    Worksheets("Upcoming").Rows("1:" & LastRow).Copy _
-        Destination:=Worksheets("Summary").Range("A1")
+    If LastRow > 1 Then
+        Worksheets("Upcoming").Rows("1:" & LastRow).Copy _
+            Destination:=Worksheets("Summary").Range("A1")
+    End If
 
-    NextAvailableRow = LastRow + 1
+    If LastRow > 1 Then
+        NextAvailableRow = LastRow + 1
+    Else
+        NextAvailableRow = 1
+    End If
 
-    'TODO only if there are duplicates'
-    'Find Last Row with Duplicates, in Historical Sheet
     LastRow = Worksheets("Historical").Cells(Rows.Count, Range("J1").Column).End(xlUp).Row
-    Worksheets("Historical").Rows("1:" & LastRow).Copy _
-        Destination:=Worksheets("Summary").Range("A" & NextAvailableRow)
+    If LastRow > 1 Then
+        Worksheets("Historical").Rows("1:" & LastRow).Copy _
+            Destination:=Worksheets("Summary").Range("A" & NextAvailableRow)
+    End If
 
-    CalcFormula = _
-      "=IF(RC[-1]=1,""Duplicate Within Upcoming Reimbursements"",""Trying to reimburse expense again."")"
-    Call InsertCalculations("K", "Notes", CalcFormula)
+    If NextAvailableRow > 0 Then
+        CalcFormula = _
+            "=IF(RC[-1]=1,""Duplicate Within Upcoming Reimbursements"",IF(ISNUMBER(RC[-1]),""Trying to reimburse expense again."",""""))"
+        Call InsertCalculations("K", "Notes", CalcFormula)
+    End If
+
 End Sub
 
 Sub SaveAsXLSX()
@@ -117,12 +124,3 @@ Sub SaveAsXLSX()
         FileFormat:=xlOpenXMLWorkbook, _
         CreateBackup:=False
 End Sub
-
-'TODO add this for the end, based off summary sheet'
-' Sub MessageDuplicate(DuplicateCount)
-'     If DuplicateCount = 0 Then
-'         MsgBox "No duplicates."
-'     Else
-'         MsgBox "Number of duplicates: " & DuplicateCount
-'     End If
-' End Sub
