@@ -22,17 +22,18 @@ For Each Rng In rngSrc.Columns
 
     If columnNumber <> 1 Then
         'The employee ID / first column'
-        rngFirstColumn.Copy
+        rngFirstColumn.Range(Cells(2,1),Cells(rngFirstColumn.Rows.Count,1)).Copy
         rngDest.Offset(columnIndex, 0).PasteSpecial Paste:=xlPasteAll
-        ' TODO try Range(rngFirstColumn.Cells(1, 2),rngFirstColumn.Cells(1, rngFirstColumn.Rows.Count)).Copy
+
         'The header / first row'
         Rng.Cells(1, 1).Copy
-        Range(rngDest.Offset(columnIndex, 1), rngDest.Offset(columnIndex + Rng.Rows.Count - 1, 1)).PasteSpecial Paste:=xlPasteAll
+        Range(rngDest.Offset(columnIndex, 1), rngDest.Offset(columnIndex + Rng.Rows.Count - 2, 1)).PasteSpecial Paste:=xlPasteAll
         'The amounts / data values'
-        Rng.Copy
+        Rng.Range(Cells(2,1),Cells(Rng.Rows.Count,1)).Copy
         rngDest.Offset(columnIndex, 2).PasteSpecial Paste:=xlPasteAll
+
         'Increments to track where to paste to next
-        columnIndex = columnIndex + Rng.Rows.Count
+        columnIndex = columnIndex + Rng.Rows.Count - 1
     End If
 
 
