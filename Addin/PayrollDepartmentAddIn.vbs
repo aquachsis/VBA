@@ -40,10 +40,16 @@ End Function
 Sub Unformat()
     'Show Gridlines
     ActiveWindow.DisplayGridlines = True
-    'Unfilter
-    ActiveSheet.AutoFilterMode = False
-    'Unmerge
-    ActiveSheet.Cells.UnMerge
+
+    With ActiveSheet
+        .AutoFilterMode = False
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .ShrinkToFit = False
+        .UnMerge
+        .EntireColumn.Hidden = False
+    End With
 End Sub
 
 
@@ -85,4 +91,12 @@ For Each Rng In rngSrc.Columns
 Next
 Application.CutCopyMode = False
 Application.ScreenUpdating = True
+End Sub
+
+Sub DeleteRowsBelowThis()
+    Dim LastRowByColumn As Long
+    Dim CurrentRow As Long
+    CurrentRow = ActiveCell.Row + 1
+    LastRowByColumn = ActiveSheet.Cells(Rows.Count, ActiveCell.Column).End(xlUp).Row
+    Rows(CurrentRow & ":" & LastRowByColumn).EntireRow.Delete
 End Sub
