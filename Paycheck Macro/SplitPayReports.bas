@@ -10,10 +10,6 @@ Sub Deductions()
     Call PublicSubs.CopyToSheet(RawDataWksName)
     Call PublicSubs.CreateUID("=TEXTJOIN(""|"",FALSE,RC[3]:RC[6])")
 
-    Sub CreateUID()
-        'do stuff here'
-    End Sub
-
     'Copy expenses.
     Workbooks(RawDataWbName).Worksheets(1).Activate
     Range("A:H").AutoFilter _

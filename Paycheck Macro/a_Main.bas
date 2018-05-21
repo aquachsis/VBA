@@ -4,7 +4,7 @@ Sub a_Main()
     Call SplitPayReports.Deductions
     Call SplitPayReports.Earnings
     Call SplitPayReports.Taxes
-    Call DirectDeposit.DirectDeposit
+    Call DirectDeposits.DirectDeposits
     Call FederalTaxableIncome.Import
     Call AddressWithholding.Import
     MsgBox "Completed."
