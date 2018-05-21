@@ -1,7 +1,6 @@
 Public FolderPath As String
 Public FileName As String
 Public FileNameNoExt As String
-Public LastRow As Long
 Public LastColumn As Long
 Public TransmissionHeaderColumn As Long
 Public TransmissionDate As String
