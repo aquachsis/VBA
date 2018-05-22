@@ -16,5 +16,5 @@ Sub CombineDirectDeposit()
     ' Check Type | Account Type | Account Number | Amount
     Range("B2:B" & LastRow).FormulaR1C1 = _
         "=TEXTJOIN(""|"",FALSE,RC[10],RC[11],RIGHT(RC[12],4),IF(RC[10]=""Voucher"",RC[15],RC[14]))"
-    Range("B2:B" & LastRow).Value = Range("A2:A" & LastRow).Value
+    Range("B2:B" & LastRow).Value = Range("B2:B" & LastRow).Value
 End Sub
