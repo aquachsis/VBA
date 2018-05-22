@@ -18,3 +18,12 @@ Public Sub CreateUID(UIDFormula)
     Range("A2:A" & LastRow).FormulaR1C1 = UIDFormula
     Range("A2:A" & LastRow).Value = Range("A2:A" & LastRow).Value
 End Sub
+
+Public Sub Unformat()
+    'Show Gridlines
+    ActiveWindow.DisplayGridlines = True
+    'Unfilter
+    ActiveSheet.AutoFilterMode = False
+    'Unmerge
+    ActiveSheet.Cells.UnMerge
+End Sub
