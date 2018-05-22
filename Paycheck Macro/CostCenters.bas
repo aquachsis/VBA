@@ -1,3 +1,5 @@
+Attribute VB_Name = "CostCenters"
+
 Sub Main()
     Call Import
     Call ManipulateData

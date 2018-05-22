@@ -1,3 +1,5 @@
+Attribute VB_Name = "DirectDeposits"
+
 Sub DirectDeposits()
     Call ImportRawData.ImportRawData("Direct Deposit")
     Workbooks(RawDataWbName).Worksheets(1).Activate

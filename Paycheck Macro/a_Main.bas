@@ -1,3 +1,5 @@
+Attribute VB_Name = "a_Main"
+
 Sub a_Main()
     Call ImportGlobalConstants.Constants
 

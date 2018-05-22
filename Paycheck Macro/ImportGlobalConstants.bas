@@ -1,3 +1,5 @@
+Attribute VB_Name = "ImportGlobalConstants"
+
 Option Explicit
 
 Public MainWbName As String

@@ -1,3 +1,5 @@
+Attribute VB_Name = "PublicSubs"
+
 Public Sub FirstRowDelete()
     Do While IsEmpty(Cells(1,1).Value)
        Rows(1).EntireRow.Delete

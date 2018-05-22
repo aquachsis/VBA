@@ -1,3 +1,5 @@
+Attribute VB_Name = "FederalTaxableIncome"
+
 Sub Main()
     Call Import
     Call ManipulateData

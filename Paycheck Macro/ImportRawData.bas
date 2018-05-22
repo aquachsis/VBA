@@ -1,3 +1,5 @@
+Attribute VB_Name = "ImportRawData"
+
 Sub ImportRawData(ReportName)
     MsgBox "Select the " & ReportName & " report / raw data."
     RawDataFilename = Application.GetOpenFilename

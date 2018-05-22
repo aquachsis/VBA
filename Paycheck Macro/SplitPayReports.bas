@@ -1,3 +1,5 @@
+Attribute VB_Name = "SplitPayReports"
+
 Sub Deductions()
     Call ImportRawData.ImportRawData("Deductions/Expenses")
 
