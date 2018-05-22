@@ -13,6 +13,7 @@ Sub Import()
 End Sub
 
 Sub RemoveUncessaryData()
+    ' TODO we need to add the name back in
     Call PublicSubs.Unformat()
     Rows(1).EntireRow.Delete
     ' Delete uncessary columns
