@@ -7,5 +7,5 @@ Public RawDataWksName As String
 Public UIDFormula As String
 
 Public Sub Constants()
-    'Place Global Constants here'
+    MainWbName = ActiveWorkbook.Name
 End Sub
