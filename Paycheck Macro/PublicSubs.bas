@@ -10,13 +10,10 @@ Public Sub CopyToSheet(SheetName)
     Workbooks(MainWbName).Sheets.Add.Name = SheetName
     LastRow = PublicFunctions.FindLastRow(1)
     LastColumn = PublicFunctions.FindLastColumn
-    ' TODO change to cell ranges
-    ' Workbooks(MainWbName).Worksheets(SheetName).Range("A1:H" & LastRow).Value = _
-    ' Workbooks(RawDataWbName).Worksheets(1).Range("A1:H" & LastRow).Value
-    Workbooks(MainWbName).Worksheets(SheetName).Range( _
-        Cells(1, 1), Cells(LastRow, LastColumn)).Value = _
-    Workbooks(RawDataWbName).Worksheets(1).Range( _
-        Cells(1, 1), Cells(LastRow, LastColumn)).Value
+    ' TODO instead of using column AM, find a way for incorporate FindLastColumn
+    ' to dynamically update depending on the report
+    Workbooks(MainWbName).Worksheets(SheetName).Range("A1:AM" & LastRow).Value = _
+    Workbooks(RawDataWbName).Worksheets(1).Range("A1:AM" & LastRow).Value
 End Sub
 
 Public Sub CreateUID(UIDFormula)
