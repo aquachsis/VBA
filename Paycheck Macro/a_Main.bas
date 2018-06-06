@@ -55,8 +55,11 @@ Sub ConsolidateSheets()
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","N",10)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","R",5)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","T",11)
+    Range("W2:W" & LastRow).Formula = "=($N2<0)"
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","X",7)
     Call PublicSubs.LookupByEE("Cost Centers","Y",5)
+
+
 End Sub
 
 Sub ImportRawData()
