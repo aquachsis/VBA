@@ -6,7 +6,7 @@ Public Sub FirstRowDelete()
    Loop
 End Sub
 
-Public Sub CopyToSheet(SheetName)
+Public Sub CopyToSheet (SheetName)
     Workbooks(MainWbName).Sheets.Add.Name = SheetName
     LastRow = PublicFunctions.FindLastRow(1)
     LastColumn = PublicFunctions.FindLastColumn
@@ -16,7 +16,7 @@ Public Sub CopyToSheet(SheetName)
     Workbooks(RawDataWbName).Worksheets(1).Range("A1:AM" & LastRow).Value
 End Sub
 
-Public Sub CreateUID(UIDFormula)
+Public Sub CreateUID (UIDFormula)
     Workbooks(MainWbName).Worksheets(RawDataWksName).Activate
     LastRow = PublicFunctions.FindLastRow(1)
     Range("A1").EntireColumn.Insert
@@ -34,10 +34,15 @@ Public Sub Unformat()
     ActiveSheet.Cells.UnMerge
 End Sub
 
-Public Sub InsertFormula(ColumnLetter, Formula)
+Public Sub InsertFormula (ColumnLetter, Formula)
     Range(ColumnLetter & "2:" & ColumnLetter & LastRow).FormulaR1C1 = Formula
 End Sub
 
 Public Sub VLOOKUP (SheetTableArray, ColumnLetter, SearchRow)
     Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Formula ="=VLOOKUP($A2,'" & SheetTableArray & "'!$A:$K," & SearchRow &",FALSE)"
+End Sub
+
+Public Sub LookupByEE (SheetTableArray, ColumnLetter, SearchRow)
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Formula = _
+    "=VLOOKUP($B2,'" & SheetTableArray & "'!$A:$K," & SearchRow &",FALSE)"
 End Sub
