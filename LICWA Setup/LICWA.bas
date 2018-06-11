@@ -58,8 +58,23 @@ Public Sub CreateBenefitElection()
     Call FillInData("J", "Flat")
     Call FillInData("K", PayPeriodStart)
 
-    ' TODO Save Salesforce sheet as CSV and Palocity sheet (on its own as XLSX)
-    'also SAVE AS this template as ORCA - Set Up - Check Date MMDDYYYY'
+    ' Saves the Salesforce sheet as a CSV, used to upload into Salesforce
+    Worksheets("Salesforce").Activate
+    ActiveWorkbook.SaveAs _
+        ThisWorkbook.Path & Application.PathSeparator & _
+        "LICWA - Salesforce Upload - Check Date " & _
+        Format(CheckDate, "mmddyyyy") & ".csv", _
+        FileFormat:=xlCSVMSDOS, CreateBackup:=False
+
+    ' Saves entire workbook, as documentation.
+    ' Paylocity sheet is moved to front for Paylocity upload'
+    Worksheets("Paylocity").Activate
+    ActiveSheet.Move Before: = ActiveWorkbook.Sheets(1)
+    ActiveWorkbook.SaveAs _
+        ThisWorkbook.Path & Application.PathSeparator & _
+        "LICWA - Paylocity Upload - Check Date " & _
+        Format(CheckDate, "mmddyyyy") & ".xlsx", _
+        FileFormat:=xlOpenXMLWorkbook, CreateBackup:=False
 End Sub
 
 Public Sub FillInData(ColumnLetter, Data)
