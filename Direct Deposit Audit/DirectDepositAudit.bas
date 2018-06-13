@@ -90,24 +90,29 @@ Sub CompareData()
 
     Worksheets("Main").Activate
     Rows(1).Insert
-    Range("A1") = "Employee ID | Routing | Account | Type | Order"
-    Range("B1") = "Category"
-    Range("C1") = "Notes"
+    Columns(1).Insert
+    Call FindLastRow("B")
+    Range("A1") = "Employee ID"
+    Call FillInData("A","=LEFT($B2,5)")
+    Range("B1") = "Employee ID | Routing | Account | Type | Order"
+    Range("C1") = "Error Type"
+    Range("D1") = "Notes"
+    Range("A1:D1").Select
+    With Selection.Interior
+        .ThemeColor = xlThemeColorAccent1
+        .TintAndShade = 0.7
+    End With
     Range("A1").CurrentRegion.Sort _
         Key1:=Range("A1"), Order1:=xlAscending, _
         Header:=xlYes
 
-    Columns.AutoFit
-End Sub
+        With ActiveWindow
+            .SplitColumn = 0
+            .SplitRow = 1
+        End With
+        ActiveWindow.FreezePanes = True
 
-Public Sub LoadFile(Filename)
-    MsgBox "Select the " & Filename & " report."
-    RawDataFilename = Application.GetOpenFilename
-    Workbooks.Open FileName:=RawDataFilename
-    RawDataWbName = ActiveWorkbook.Name
-    Workbooks(RawDataWbName).Sheets(1).Name = Filename
-    Workbooks(RawDataWbName).Sheets(1).Move After:= _
-        Workbooks(MainWbName).Sheets(Workbooks(MainWbName).Worksheets.Count)
+    Columns.AutoFit
 End Sub
 
 Sub SaveAsXLSX()
@@ -118,6 +123,16 @@ Sub SaveAsXLSX()
         OutfileNameXLSX, _
         FileFormat:=xlOpenXMLWorkbook, _
         CreateBackup:=False
+End Sub
+
+Public Sub LoadFile(Filename)
+    MsgBox "Select the " & Filename & " report."
+    RawDataFilename = Application.GetOpenFilename
+    Workbooks.Open FileName:=RawDataFilename
+    RawDataWbName = ActiveWorkbook.Name
+    Workbooks(RawDataWbName).Sheets(1).Name = Filename
+    Workbooks(RawDataWbName).Sheets(1).Move After:= _
+        Workbooks(MainWbName).Sheets(Workbooks(MainWbName).Worksheets.Count)
 End Sub
 
 Public Sub UnformatSheet()
