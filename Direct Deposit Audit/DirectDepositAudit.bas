@@ -1,6 +1,7 @@
 Attribute VB_Name = "DirectDepositAudit"
 
 Public LastRow as Long
+Public MainSheetRowCounter As Long
 Public MainWbName As String
 Public RawDataFilename As String
 Public RawDataWbName As String
@@ -14,6 +15,7 @@ Sub a_AuditDirectDeposits()
     Call FormatPaylocityData
     Call FormatSalesforceData
     Call CompareData
+    Call SaveAsXLSX
 End Sub
 
 Sub FormatPaylocityData()
@@ -46,14 +48,56 @@ End Sub
 
 Sub CompareData()
     Worksheets("Paylocity").Activate
+    Call FindLastRow("A")
     Columns(2).Insert
     Range("B1") = "In Salesforce?"
+    LastRow = LastRow - 1 'Paylocity report has one blank cell at the bottom'
     Call FillInData("B","=IF(ISNA(VLOOKUP($A2,Salesforce!$A:$A,1,0)),""No"",""Yes"")")
 
+    MainSheetRowCounter = 1
+    For i = 2 To LastRow
+        If Cells(i, 2) = "No" Then
+            Sheets("Main").Cells(MainSheetRowCounter, 1) = _
+                Sheets("Paylocity").Cells(i, 1)
+            Sheets("Main").Cells(MainSheetRowCounter, 2) = _
+                "In Paylocity but not in Salesforce"
+            MainSheetRowCounter = MainSheetRowCounter + 1
+        End If
+    Next i
+
     Worksheets("Salesforce").Activate
+    Call FindLastRow("A")
     Columns(2).Insert
     Range("B1") = "In Paylocity?"
     Call FillInData("B","=IF(ISNA(VLOOKUP($A2,Paylocity!$A:$A,1,0)),""No"",""Yes"")")
+    For i = 2 To LastRow
+        If Cells(i, 2) = "No" Then
+            Sheets("Main").Cells(MainSheetRowCounter, 1) = _
+                Sheets("Salesforce").Cells(i, 1)
+            Sheets("Main").Cells(MainSheetRowCounter, 2) = _
+                "In Salesforce but not in Paylocity"
+
+            'Checks to see if it's in Salesforce but we haven't entered
+            'into Paylocity, i.e. new hires
+            If Cells(i, 21) = "0" Then
+            Sheets("Main").Cells(MainSheetRowCounter, 3) = _
+                "We haven't entered into Paylocity yet, i.e. new hire, or recently entered direct deposit."
+            End If
+
+            MainSheetRowCounter = MainSheetRowCounter + 1
+        End If
+    Next i
+
+    Worksheets("Main").Activate
+    Rows(1).Insert
+    Range("A1") = "Employee ID | Routing | Account | Type | Order"
+    Range("B1") = "Category"
+    Range("C1") = "Notes"
+    Range("A1").CurrentRegion.Sort _
+        Key1:=Range("A1"), Order1:=xlAscending, _
+        Header:=xlYes
+
+    Columns.AutoFit
 End Sub
 
 Public Sub LoadFile(Filename)
@@ -64,6 +108,16 @@ Public Sub LoadFile(Filename)
     Workbooks(RawDataWbName).Sheets(1).Name = Filename
     Workbooks(RawDataWbName).Sheets(1).Move After:= _
         Workbooks(MainWbName).Sheets(Workbooks(MainWbName).Worksheets.Count)
+End Sub
+
+Sub SaveAsXLSX()
+    OutfileNameXLSX = "Direct Deposit Audit " & Format(Date, "mmddyyyy") &".xlsx"
+    ActiveWorkbook.SaveAs _
+        ThisWorkbook.Path & _
+        Application.PathSeparator & _
+        OutfileNameXLSX, _
+        FileFormat:=xlOpenXMLWorkbook, _
+        CreateBackup:=False
 End Sub
 
 Public Sub UnformatSheet()
