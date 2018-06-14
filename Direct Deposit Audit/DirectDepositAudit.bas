@@ -16,6 +16,7 @@ Sub a_AuditDirectDeposits()
     Call FormatSalesforceData
     Call CompareData
     Call SaveAsXLSX
+    MsgBox "Macro finished running."
 End Sub
 
 Sub FormatPaylocityData()
