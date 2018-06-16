@@ -13,6 +13,9 @@ Sub a_NetCheckAudit()
     Call DetermineCategory
     Call AddFormatting
     Call SplitCategories
+    'TODO Split and save each category as a new file'
+    ' automate misc steps like IE note issued, replacement, peter pan, etc.
+    ' gross over 2500 exceptions for owners VP, etc. Lookup title?
 End Sub
 
 Sub OpenNetCheckAudit()
