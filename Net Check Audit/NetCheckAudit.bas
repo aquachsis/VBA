@@ -1,30 +1,35 @@
-Attribute VB_Name = "NetCheckAudit"
 
 Option Explicit
 Public LastRow As Long
-Public NetCheckAuditFilename As String
+Public MainWbName As String
+Public SourceFilename As String
+Public SourceWbName As String
 
-Sub a_NetCheckAudit()
+Sub NetCheckAudit()
 'Run this Subroutine, it's the main one.
     Call OpenNetCheckAudit
-    Call RemovePaylocityFormatting
+    Call LoadEINotIssued
+    Worksheets("Main").Activate
+    Call Unformat
     Call DeleteSubtotals
     Call DetermineDisposableIncome
     Call DetermineCategory
     Call AddFormatting
-    Call SplitCategories
-    'TODO Split and save each category as a new file'
-    ' automate misc steps like IE note issued, replacement, peter pan, etc.
-    ' gross over 2500 exceptions for owners VP, etc. Lookup title?
+    Call SortData
+    'TODO replacements should have $0 tax, and ded = net'
+    Worksheets("Main").Activate
+    MsgBox "Complete."
 End Sub
 
 Sub OpenNetCheckAudit()
     MsgBox "Select the Pre Process Net Check Audit report."
-    NetCheckAuditFilename = Application.GetOpenFilename
-    Workbooks.Open FileName:=NetCheckAuditFilename
+    SourceFilename = Application.GetOpenFilename
+    Workbooks.Open FileName:=SourceFilename
+    Sheets(1).Name = "Main"
+    MainWbName = ActiveWorkbook.Name
 End Sub
 
-Sub RemovePaylocityFormatting()
+Sub Unformat()
     ActiveWindow.DisplayGridlines = True
 
     With Cells
@@ -35,8 +40,9 @@ Sub RemovePaylocityFormatting()
     Do While IsEmpty(Cells(1, 1).Value)
        Rows(1).EntireRow.Delete
    Loop
+End Sub
 
-    'Deletes rows with subtotals'
+Sub DeleteSubtotals()
     LastRow = FindLastRow(1)
     Dim i As Long
     For i = LastRow To 2 Step -1
@@ -49,7 +55,7 @@ End Sub
 Sub DetermineDisposableIncome()
     LastRow = FindLastRow(1)
     Range("K1") = "50% of Disposable Income"
-    Call FillInData("K","=($G2-$H2)/2")
+    Call FillInData("K", "=($G2-$H2)/2")
 End Sub
 
 Sub DetermineCategory()
@@ -58,7 +64,12 @@ Sub DetermineCategory()
     'Net under 5. Net less than 50% of disposable income. Gross over $2500.
     Call FillInData( _
         "L", _
-        "=IF($J2<5,""Net Under $5"",IF($J2<$K2,""Net Less Than 50% of Disposable Income"",IF($G2>2500,""Gross Over $2500"","""")))" _
+        "=IF(ISNA(VLOOKUP($A2,'EI Not Issued'!$C:$C,1,0))," & _
+            "IF($A2=17296,""Peter Pan, delete check.""," & _
+            "IF($J2<5,""Net Under $5""," & _
+            "IF($J2<$K2,""Net Less Than 50% of Disposable Income""," & _
+            "IF($G2>2500,""Gross Over $2500"",""""))))," & _
+        """Remove check, final check processed but not issued."")" _
     )
 End Sub
 
@@ -66,7 +77,7 @@ Sub AddFormatting()
     Cells.Select
     With Selection.Font
         .Name = "Arial"
-        .Size = 12
+        .Size = 10
     End With
 
     With ActiveWindow
@@ -76,8 +87,11 @@ Sub AddFormatting()
     ActiveWindow.FreezePanes = True
     Columns.AutoFit
     Rows.AutoFit
-    Columns(1).TextToColumns
+    ' Worksheets(1).Columns("A:Z").AutoFi
+    Columns(1).Value = Columns(1).Value
+End Sub
 
+Sub SortData()
 'Sort by category, batch, then employee number
     Range("A1").CurrentRegion.Sort _
         Key1:=Range("L1"), Order1:=xlDescending, _
@@ -86,14 +100,15 @@ Sub AddFormatting()
         Header:=xlYes
 End Sub
 
-Sub SplitCategories()
-    ' Look at the EMS Duplicate macro, it looks for a certain criteria and copies to new sheet
-    LastRow = FindLastRow(12)
-    For i = 2 To LastRow
-        If Cells(i, 12) = "Net Under $5" Then
-            Cells(i, 13) = Cells(i, 12)
-        End If
-    Next i
+Sub LoadEINotIssued()
+    MsgBox "Select the EI - Processed Not Issued report."
+    SourceFilename = Application.GetOpenFilename
+    Workbooks.Open FileName:=SourceFilename
+    Sheets(1).Name = "Main"
+    SourceWbName = ActiveWorkbook.Name
+    Workbooks(SourceWbName).Sheets(1).Name = "EI Not Issued"
+    Workbooks(SourceWbName).Sheets(1).Move After:= _
+        Workbooks(MainWbName).Sheets(Workbooks(MainWbName).Worksheets.Count)
 End Sub
 
 Public Function FindLastRow(ColumnNumber)
@@ -102,7 +117,6 @@ End Function
 
 Public Sub FillInData(ColumnLetter, Data)
     Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value = Data
-    ' If we needed to copy and paste just values:
-    ' Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value = _
-    '     Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value = _
+        Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value
 End Sub
