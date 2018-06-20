@@ -65,11 +65,11 @@ Sub DetermineCategory()
     Call FillInData( _
         "L", _
         "=IF(ISNA(VLOOKUP($A2,'EI Not Issued'!$C:$C,1,0))," & _
-            "IF($A2=17296,""Peter Pan, delete check.""," & _
+            "IF($A2=17296,""Misc. - Peter Pan, delete check.""," & _
             "IF($J2<5,""Net Under $5""," & _
             "IF($J2<$K2,""Net Less Than 50% of Disposable Income""," & _
             "IF($G2>2500,""Gross Over $2500"",""""))))," & _
-        """Remove check, final check processed but not issued."")" _
+        """Misc. - Final check processed, EI not issued. Remove check."")" _
     )
 End Sub
 
