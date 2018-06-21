@@ -13,6 +13,7 @@ Sub ConsolidateSheets()
     Worksheets("Main").Activate
 
     'UID'
+    'TODO main sure there are no duplicates in UID'
     Worksheets("Fed Taxable Inc").Columns(1).Copy Destination:= _
     Worksheets("Main").Range("A1")
 
