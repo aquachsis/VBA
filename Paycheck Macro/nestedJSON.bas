@@ -55,8 +55,10 @@ Sub accessDictAndColl()
     jsonDictCode("Code") = Cells(2, 2)
     jsonDictCode("Amount") = Cells(2, 3)
     jsonMainColl.Add jsonDictCode, UIDValue
-    MsgBox JsonConverter.ConvertToJson(jsonMainColl("12345")("Code"), Whitespace:=2)
+    MsgBox JsonConverter.ConvertToJson(jsonMainColl("12345"), Whitespace:=2)
 
+    'This accesses the decution information by employee number'
+    Worksheets("Deduction").Activate
     UIDValue = Cells(4, 1)
     jsonDictCode("Code") = Cells(4, 2)
     jsonDictCode("Amount") = Cells(4, 3)
