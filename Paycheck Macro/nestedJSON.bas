@@ -9,7 +9,7 @@ Public rowCount As Long
 Public UIDValue As String
 
 Sub convertPay()
-    Worksheets("Deduction").Activate
+    Worksheets("Deductions").Activate
     Set excelRange = Cells(1, 1).CurrentRegion
     'If UID = UID+1 Then //Add Dict //Else Add to Dict, Append Collection, Clear Dic
     For rowCount = 2 To excelRange.Rows.Count
@@ -30,8 +30,10 @@ Sub convertPay()
     For rowCount = 2 To excelRange.Rows.Count
         UIDValue = Cells(rowCount, 1)
         jsonDict("UID") = UIDValue
-        jsonDict("Net") = Cells(rowCount, 2)
         jsonDict("Deduction") = jsonDeductionColl(UIDValue)
+            For columnCount = 2 To excelRange.Columns.Count
+                jsonDict(Cells(1, columnCount)) = Cells(rowCount, columnCount)
+            Next columnCount
         jsonMainColl.Add jsonDict, UIDValue
         Set jsonDict = Nothing
     Next rowCount
