@@ -13,6 +13,13 @@ Public nestedTaxes As New Collection
 Public rowCount As Long
 Public UIDValue As String
 
+Sub Notes()
+'https://www.linkedin.com/pulse/convert-excel-json-using-vba-thomas-clouse/
+'http://excelerator.solutions/2017/08/24/convert-excel-to-json-using-vba/
+'https://github.com/VBA-tools/VBA-Dictionary
+'https://github.com/VBA-tools/VBA-JSON'
+End Sub
+
 Sub convertPay()
     Worksheets("Deductions").Activate
     Set excelRange = Cells(1, 1).CurrentRegion
