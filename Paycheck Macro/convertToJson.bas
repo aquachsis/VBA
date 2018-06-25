@@ -18,13 +18,15 @@ Sub Notes()
 'http://excelerator.solutions/2017/08/24/convert-excel-to-json-using-vba/
 'https://github.com/VBA-tools/VBA-Dictionary
 'https://github.com/VBA-tools/VBA-JSON'
+
+'TODO what if there are multiple of same code for the same UID? e.g. one UID has 2 ORCAs
 End Sub
 
 Sub convertPay()
     Worksheets("Deductions").Activate
     Set excelRange = Cells(1, 1).CurrentRegion
     'If UID = UID+1 Then //Add Dict //Else Add to Dict, Append Collection, Clear Dic
-    'TODO what if there are multiple of same code for the same UID? e.g. one UID has 2 ORCAs'
+
     For rowCount = 2 To excelRange.Rows.Count
         UIDValue = Cells(rowCount, 1)
         If Cells(rowCount, 1) = Cells(rowCount + 1, 1) Then
