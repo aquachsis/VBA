@@ -1,3 +1,5 @@
+Attribute VB_Name = "convertToJson"
+
 Public columnCount As Long
 Public excelRange As Range
 Public jsonCollection As New Collection
