@@ -34,8 +34,11 @@ Public Sub Unformat()
     ActiveSheet.Cells.UnMerge
 End Sub
 
-Public Sub InsertFormula (ColumnLetter, Formula)
-    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).FormulaR1C1 = Formula
+Public Sub InsertFormula(Header, ColumnLetter, Formula)
+    Range(ColumnLetter & "1") = Header
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow) = Formula
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value = _
+        Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value
 End Sub
 
 Public Sub VLOOKUP (SheetTableArray, ColumnLetter, SearchRow)

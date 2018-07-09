@@ -1,6 +1,9 @@
-Attribute VB_Name = "AddressWithholding"
+'TODO Attribute VB_Name = "AddressWithholding"
 
 Sub Main()
+    Call ImportGlobalConstants.Constants 'TODO remove, testing'
+    ActiveSheet.Name = "Main" 'TODO remove, testing'
+
     Call Import
     Call RemoveUncessaryData
     Call ManipulateData
@@ -24,96 +27,121 @@ Sub RemoveUncessaryData()
 End Sub
 
 Sub ManipulateData()
+    LastRow = PublicFunctions.FindLastRow(1) 'TODO remove, testing'
+
     'Creates UID then delete the original columns
-    Call PublicSubs.CreateUID("=TEXTJOIN(""|"",FALSE,RC[1]:RC[2])")
+    Call InsertFormula("UID", "A", "=TEXTJOIN(""|"",FALSE,$B2:$C2)")
     Range(Columns(2), Columns(3)).Delete
 
     'Creates address field'
     LastRow = PublicFunctions.FindLastRow(1)
-    Range("B1").EntireColumn.Insert
-    Range("B1").Value = "Address"
-    Range("B2:B" & LastRow).FormulaR1C1 = "=TEXTJOIN(""|"",FALSE,RC[3]:RC[7])"
-    Range("B2:B" & LastRow).Value = Range("B2:B" & LastRow).Value
-
+    Call InsertFormula("Address", "B", "=TEXTJOIN(""|"",FALSE,RC[3]:RC[7])")
     Columns("E:I").EntireColumn.Delete
-          Columns("F:F").Insert
 
- Rows("1:1").Clear
-          Columns("E:E").TextToColumns Destination:=Range("E1"), DataType:=xlDelimited, _
-            Space:=True, FieldInfo:=Array(Array(1, 1), Array(2, 1))
-          Columns("G:G").Insert
+    'Splits Federal Status and Allowances'
+    Columns("F:F").Insert
+    Columns("E:E").TextToColumns _
+        Destination:=Range("E1"), _
+        DataType:=xlDelimited, _
+        Space:=True
+    Call InsertFormula("Federal Allowances", "G", "=MID($F2,2,LEN($F2)-7)")
+    Columns("F:F").Delete
+
+'TODO THIS IS WHERE I AM WORKING AT
+
+    'Splits the federal withhold amount (default, flat amounts, or percentages)
+    Columns("H:I").Insert
+    Columns("G:G").TextToColumns _
+        Destination:=Range("G1"), _
+        DataType:=xlDelimited, _
+        Space:=True
+
+    For i = 2 To LastRow
+        If Cells(i, 7) = "D" OR Cells(i, 7) = "B" Then
+            'Default or Blocked
+            Cells(i, 9) = "0"
+        ElseIf Cells(i, 7) = "F" OR Cells(i, 7) = "AF" Then
+            'Flat Dollar Amount or Additional Flat Amount
+            Cells(i, 9) = "=MID(RC[-1],2,LEN(RC[-1])-7)"
+        ElseIf Cells(i, 7) = "P" OR Cells(i, 7) = "AP" Then
+            'Flat Percentage or Additional Percentage
+            Cells(i, 9) = "=MID(RC[-1],7,LEN(RC[-1])-7)"
+        ElseIf Cells(i, 7) = "AFAP" OR Cells(i, 7) = "FDFP" Then
+            'Additional Flat Plus Additional %, or Flat Dollar Plus Fixed %
+            Cells(i, 9) = "=MID(RC[-1],2,LEN(RC[-1])-2)"
+        Else
+        End If
+    Next i
+    Range("I:I").Value = Range("I:I").Value
+    Columns("H:H").Delete
+
+    'Splits state withholding status'
+    Columns("K:K").Insert
+    Columns("J:J").TextToColumns _
+        Destination:=Range("J1"), _
+        DataType:=xlDelimited, _
+        Space:=True
+    Call InsertFormula("", "L", "=MID(RC[-1],2,LEN(RC[-1])-7)")
+    Columns("K:K").Delete
+
+    Columns("L:L").TextToColumns _
+        Destination:=Range("L1"), _
+        DataType:=xlDelimited, _
+        Space:=True
+
+    For i = 2 To LastRow
+        If Cells(i, 12) = "D" OR Cells(i, 12) = "B" Then
+            'Default or Blocked
+            Cells(i, 14) = "0"
+        ElseIf Cells(i, 12) = "F" OR Cells(i, 12) = "AF" Then
+            'Flat Dollar Amount or Additional Flat Amount
+            Cells(i, 14) = "=MID(RC[-1],2,LEN(RC[-1])-7)"
+        ElseIf Cells(i, 12) = "P" OR Cells(i, 12) = "AP" Then
+            'Flat Percentage or Additional Percentage
+            Cells(i, 14) = "=MID(RC[-1],7,LEN(RC[-1])-7)"
+        ElseIf Cells(i, 12) = "AFAP" OR Cells(i, 12) = "FDFP" Then
+            'Additional Flat Plus Additional %, or Flat Dollar Plus Fixed %
+            Cells(i, 14) = "=MID(RC[-1],2,LEN(RC[-1])-2)"
+        Else
+        End If
+    Next i
+    Range("N:N").Value = Range("N:N").Value
+    Columns("M:M").Delete
+
+    For i = 2 To LastRow
+        If Cells(i, 10) = "N/A" Then
+            Range("K" & i & ":M" & i) = "N/A"
+        Else
+        End If
+    Next i
+
+    Range("A1").Value = "UID"
+    Range("B1").Value = "Address"
+    Range("C1").Value = "Begin Date"
+    Range("D1").Value = "End Date"
+    Range("E1").Value = "FITW Election Status"
+    Range("F1").Value = "FITW Exemptions"
+    Range("G1").Value = "Fed Amount Type"
+    Range("H1").Value = "Fed Amount"
+    Range("I1").Value = "State"
+    Range("J1").Value = "SITW Filing Status"
+    Range("K1").Value = "SITW Exemptions"
+    Range("L1").Value = "State Amount Type"
+    Range("M1").Value = "State Amount"
+End Sub
 
 
-        Range("G2:G" & LastRow).FormulaR1C1 = "=MID(RC[-1],2,LEN(RC[-1])-7)"
-        Range("G:G").Value = Range("G:G").Value
-        Columns("F:F").Delete
+Public Sub FillFormula(Header, ColumnLetter, Formula)
+    Range(ColumnLetter & "1") = Header
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow) = Formula
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value = _
+        Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value
+End Sub
 
-        Columns("H:H").Insert
-        Columns("G:G").TextToColumns Destination:=Range("G1"), DataType:=xlDelimited, _
-          Space:=True, FieldInfo:=Array(Array(1, 1), Array(2, 1))
-          Columns("I:I"). Insert
-          Range("I2:I" & LastRow).FormulaR1C1 = "=MID(RC[-1],2,LEN(RC[-1])-7)"
-          Range("A:L").AutoFilter _
-              Field:=7, _
-              Criteria1:=Array("P", "AP"), _
-              Operator:=xlFilterValues
-          Range("I:I").SpecialCells(xlCellTypeVisible).FormulaR1C1 = "=MID(RC[-1],7,LEN(RC[-1])-7)"
-          ActiveSheet.AutoFilterMode = False
-          Range("A:L").AutoFilter _
-              Field:=7, _
-              Criteria1:=Array("AFAP", "FDFP"), _
-              Operator:=xlFilterValues
-          Range("I:I").SpecialCells(xlCellTypeVisible).FormulaR1C1 = "=MID(RC[-1],2,LEN(RC[-1])-2)"
-          ActiveSheet.AutoFilterMode = False
-          Range("I:I").Value = Range("I:I").Value
-          Columns("H:H").Delete
-
-Columns("K:K").Insert
-Columns("J:J").TextToColumns Destination:=Range("J1"), DataType:=xlDelimited, _
-  Space:=True, FieldInfo:=Array(Array(1, 1), Array(2, 1))
-  Columns("L:L"). Insert
-  Range("L2:L" & LastRow).FormulaR1C1 = "=MID(RC[-1],2,LEN(RC[-1])-7)"
-Range("L:L").Value = Range("L:L").Value
-  Columns("K:K").Delete
-
-Columns("L:L").TextToColumns Destination:=Range("L1"), DataType:=xlDelimited, _
-  Space:=True, FieldInfo:=Array(Array(1, 1), Array(2, 1))
-  Range("N2:N" & LastRow).FormulaR1C1 = "=MID(RC[-1],2,LEN(RC[-1])-7)"
-  Range("A:N").AutoFilter _
-      Field:=12, _
-      Criteria1:=Array("P", "AP"), _
-      Operator:=xlFilterValues
-Range("N:N").SpecialCells(xlCellTypeVisible).FormulaR1C1 = "=MID(RC[-1],7,LEN(RC[-1])-7)"
-ActiveSheet.AutoFilterMode = False
-Range("A:N").AutoFilter _
-    Field:=7, _
-    Criteria1:=Array("AFAP", "FDFP"), _
-    Operator:=xlFilterValues
-Range("N:N").SpecialCells(xlCellTypeVisible).FormulaR1C1 = "=MID(RC[-1],2,LEN(RC[-1])-2)"
-    ActiveSheet.AutoFilterMode = False
-Range("N:N").Value = Range("N:N").Value
-  Columns("M:M").Delete
-
-
-  Range("A:M").AutoFilter _
-      Field:=10, _
-      Criteria1:=("N/A"), _
-      Operator:=xlFilterValues
-Range("K:M").SpecialCells(xlCellTypeVisible).Value = "N/A"
-ActiveSheet.AutoFilterMode = False
-
-  Range("A1").Value = "UID"
-  Range("B1").Value = "Address"
-  Range("C1").Value = "Begin Date"
-  Range("D1").Value = "End Date"
-  Range("E1").Value = "FITW Election Status"
-  Range ("F1").Value = "FITW Exemptions"
-  Range("G1").Value = "Fed Amount Type"
-  Range ("H1").Value = "Fed Amount"
-  Range ("I1").Value = "State"
-  Range("J1").Value = "SITW Filing Status"
-  Range("K1").Value = "SITW Exemptions"
-  Range("L1").Value = "State Amount Type"
-  Range ("M1").Value = "State Amount"
-
+Public Sub InsertFormula(Header, ColumnLetter, Formula)
+    Columns(ColumnLetter & ":" & ColumnLetter).Insert
+    Range(ColumnLetter & "1") = Header
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow) = Formula
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value = _
+        Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value
 End Sub
