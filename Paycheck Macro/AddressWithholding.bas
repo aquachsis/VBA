@@ -33,29 +33,24 @@ Sub ManipulateData()
     Call InsertFormula("UID", "A", "=TEXTJOIN(""|"",FALSE,$B2:$C2)")
     Range(Columns(2), Columns(3)).Delete
 
-    'Creates address field'
     LastRow = PublicFunctions.FindLastRow(1)
+
+    'Creates address field'
     Call InsertFormula("Address", "B", "=TEXTJOIN(""|"",FALSE,RC[3]:RC[7])")
-    Columns("E:I").EntireColumn.Delete
+    Columns("E:I").EntireColumn.Delete 'Delete separate address fields'
 
-    'Splits Federal Status and Allowances'
-    Columns("F:F").Insert
-    Columns("E:E").TextToColumns _
-        Destination:=Range("E1"), _
-        DataType:=xlDelimited, _
-        Space:=True
-    Call InsertFormula("Federal Allowances", "G", "=MID($F2,2,LEN($F2)-7)")
-    Columns("F:F").Delete
-
-'TODO THIS IS WHERE I AM WORKING AT
+    'SPLIT FEDERAL WITHHOLDING STATUS AND ALLOWANCES'
+    Call InsertFormula("FITW Status", "F","=LEFT($E2,FIND("" "",$E2)-1)")
+    Call InsertFormula("FITW Allowance","G", _
+        "=MID(RIGHT($E2,LEN($E2)-FIND("" "",$E2)),2,LEN(RIGHT($E2,LEN($E2)-FIND("" "",$E2)))-7)")
+    Columns("E:E").Delete 'Delete original concatenated FITW Status & Allowance'
 
     'Splits the federal withhold amount (default, flat amounts, or percentages)
-    Columns("H:I").Insert
-    Columns("G:G").TextToColumns _
-        Destination:=Range("G1"), _
-        DataType:=xlDelimited, _
-        Space:=True
+    Call InsertFormula("FITW Withholding Type", "H","=LEFT($G2,FIND("" "",$G2)-1)")
+    Call InsertFormula("FITW Withholding Amount", "I", "=RIGHT($G2,LEN($G2)-FIND("" "",$G2))")
+    Columns("G:G").Delete
 
+    Call InsertFormula("FITW Withholding Amount", "I", "")
     For i = 2 To LastRow
         If Cells(i, 7) = "D" OR Cells(i, 7) = "B" Then
             'Default or Blocked
@@ -75,20 +70,18 @@ Sub ManipulateData()
     Range("I:I").Value = Range("I:I").Value
     Columns("H:H").Delete
 
-    'Splits state withholding status'
-    Columns("K:K").Insert
-    Columns("J:J").TextToColumns _
-        Destination:=Range("J1"), _
-        DataType:=xlDelimited, _
-        Space:=True
-    Call InsertFormula("", "L", "=MID(RC[-1],2,LEN(RC[-1])-7)")
-    Columns("K:K").Delete
+    'SPLIT STATE WITHHOLDING STATUS AND ALLOWANCES'
+    Call InsertFormula("SITW Status", "K","=LEFT($J2,FIND("" "",$J2)-1)")
+    Call InsertFormula("SITW Allowances", "L", _
+        "=MID(RIGHT($J2,LEN($J2)-FIND("" "",$J2)),2,LEN(RIGHT($J2,LEN($J2)-FIND("" "",$J2)))-7)")
+    Columns("J:J").Delete 'Delete original concatenated SITW Status & Allowance'
 
-    Columns("L:L").TextToColumns _
-        Destination:=Range("L1"), _
-        DataType:=xlDelimited, _
-        Space:=True
+    'Splits the state withhold amount (default, flat amounts, or percentages)
+    Call InsertFormula("SITW Withholding Type", "M","=LEFT($L2,FIND("" "",$L2)-1)")
+    Call InsertFormula("SITW Withholding Amount", "N", "=RIGHT($L2,LEN($L2)-FIND("" "",$L2))")
+    Columns("L:L").Delete
 
+    Call InsertFormula("SITW Withholding Amount", "N", "")
     For i = 2 To LastRow
         If Cells(i, 12) = "D" OR Cells(i, 12) = "B" Then
             'Default or Blocked
@@ -117,16 +110,16 @@ Sub ManipulateData()
 
     Range("A1").Value = "UID"
     Range("B1").Value = "Address"
-    Range("C1").Value = "Begin Date"
-    Range("D1").Value = "End Date"
-    Range("E1").Value = "FITW Election Status"
-    Range("F1").Value = "FITW Exemptions"
-    Range("G1").Value = "Fed Amount Type"
+    Range("C1").Value = "Period Begin"
+    Range("D1").Value = "Period Date"
+    Range("E1").Value = "Fed Status"
+    Range("F1").Value = "Fed Allowance"
+    Range("G1").Value = "Fed Type"
     Range("H1").Value = "Fed Amount"
     Range("I1").Value = "State"
-    Range("J1").Value = "SITW Filing Status"
-    Range("K1").Value = "SITW Exemptions"
-    Range("L1").Value = "State Amount Type"
+    Range("J1").Value = "State Status"
+    Range("K1").Value = "State Allowance"
+    Range("L1").Value = "State Type"
     Range("M1").Value = "State Amount"
 End Sub
 
