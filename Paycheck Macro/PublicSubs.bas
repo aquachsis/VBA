@@ -41,11 +41,16 @@ Public Sub InsertFormula(Header, ColumnLetter, Formula)
         Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Value
 End Sub
 
-Public Sub VLOOKUP (SheetTableArray, ColumnLetter, SearchRow)
-    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Formula ="=VLOOKUP($A2,'" & SheetTableArray & "'!$A:$K," & SearchRow &",FALSE)"
+Public Sub VLOOKUP (SheetTableArray, ColumnLetter, colIndex)
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Formula ="=VLOOKUP($A2,'" & SheetTableArray & "'!$A:$K," & colIndex &",FALSE)"
 End Sub
 
-Public Sub LookupByEE (SheetTableArray, ColumnLetter, SearchRow)
+Public Sub LookupByEE (SheetTableArray, ColumnLetter, colIndex)
     Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Formula = _
-    "=VLOOKUP($B2,'" & SheetTableArray & "'!$A:$K," & SearchRow &",FALSE)"
+    "=VLOOKUP($B2,'" & SheetTableArray & "'!$A:$K," & colIndex &",FALSE)"
+End Sub
+
+Public Sub LookupByEEandCK (SheetTableArray, ColumnLetter, colIndex)
+    Range(ColumnLetter & "2:" & ColumnLetter & LastRow).Formula = _
+    "=VLOOKUP($B2 &""|""& $X2,'" & SheetTableArray & "'!$A:$M," & colIndex & ",FALSE)"
 End Sub

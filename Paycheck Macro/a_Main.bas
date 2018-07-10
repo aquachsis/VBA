@@ -47,17 +47,26 @@ Sub ConsolidateSheets()
     Range("X1") = "Voucher / Check No"
     Range("Y1") = "Working State"
 
+    'This is Voucher / Check No, some of the following
+    'columns are dependant on this
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","B",2)
+    Call PublicSubs.VLOOKUP("Fed Taxable Inc","X",7)
+
+
+    Call PublicSubs.LookupByEEandCK("Add and WH", "C",2)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","D",4)
     Call PublicSubs.LookupByEE("Cost Centers","F",4)
     Call PublicSubs.LookupByEE("Cost Centers","G",3)
+    Call PublicSubs.LookupByEEandCK("Add and WH", "J",5)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","K",8)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","L",9)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","N",10)
+    Call PublicSubs.LookupByEEandCK("Add and WH", "P",3)
+    Call PublicSubs.LookupByEEandCK("Add and WH", "Q",4)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","R",5)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","T",11)
+    Call PublicSubs.LookupByEEandCK("Add and WH", "U",10)
     Range("W2:W" & LastRow).Formula = "=($N2<0)"
-    Call PublicSubs.VLOOKUP("Fed Taxable Inc","X",7)
     Call PublicSubs.LookupByEE("Cost Centers","Y",5)
 
 
