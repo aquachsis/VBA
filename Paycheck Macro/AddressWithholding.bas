@@ -1,12 +1,9 @@
-'TODO Attribute VB_Name = "AddressWithholding"
+Attribute VB_Name = "AddressWithholding"
 
 Sub Main()
-    Call ImportGlobalConstants.Constants 'TODO remove, testing'
-    ActiveSheet.Name = "Main" 'TODO remove, testing'
-
     Call Import
     Call RemoveUncessaryData
-    Call ManipulateData
+    Call FormatAddressAndWithholding
 End Sub
 
 Sub Import()
@@ -18,7 +15,6 @@ Sub Import()
 End Sub
 
 Sub RemoveUncessaryData()
-    ' TODO we need to add the name back in
     Call PublicSubs.Unformat()
     Rows(1).EntireRow.Delete
     ' Delete uncessary columns
@@ -26,14 +22,13 @@ Sub RemoveUncessaryData()
     Range(Columns(2), Columns(18)).Delete
 End Sub
 
-Sub ManipulateData()
-    LastRow = PublicFunctions.FindLastRow(1) 'TODO remove, testing'
-
+Sub FormatAddressAndWithholding()
+    LastRow = PublicFunctions.FindLastRow(1)
     'Creates UID then delete the original columns
     Call InsertFormula("UID", "A", "=TEXTJOIN(""|"",FALSE,$B2:$C2)")
     Range(Columns(2), Columns(3)).Delete
 
-    LastRow = PublicFunctions.FindLastRow(1)
+
 
     'Creates address field'
     Call InsertFormula("Address", "B", "=TEXTJOIN(""|"",FALSE,RC[3]:RC[7])")
@@ -122,7 +117,6 @@ Sub ManipulateData()
     Range("L1").Value = "State Type"
     Range("M1").Value = "State Amount"
 End Sub
-
 
 Public Sub FillFormula(Header, ColumnLetter, Formula)
     Range(ColumnLetter & "1") = Header
