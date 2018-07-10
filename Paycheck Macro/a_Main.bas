@@ -12,15 +12,14 @@ End Sub
 Sub ConsolidateSheets()
     Worksheets("Main").Activate
 
-    'UID'
     'TODO main sure there are no duplicates in UID'
     Worksheets("Fed Taxable Inc").Columns(1).Copy Destination:= _
-    Worksheets("Main").Range("A1")
+        Worksheets("Main").Range("A1") 'This is the UID'
 
     'Define LastRow'
     LastRow = PublicFunctions.FindLastRow(1)
 
-    'Tab, Main Tab's Column, Source Column
+    'TODO rewrite functions to take header name as arugement'
     Range("A1") = "UID"
     Range("B1") = "Employee Number"
     Range("C1") = "Address"
@@ -47,14 +46,14 @@ Sub ConsolidateSheets()
     Range("X1") = "Voucher / Check No"
     Range("Y1") = "Working State"
 
-    'This is Voucher / Check No, some of the following
-    'columns are dependant on this
-    Call PublicSubs.VLOOKUP("Fed Taxable Inc","B",2)
-    Call PublicSubs.VLOOKUP("Fed Taxable Inc","X",7)
+    'These are first because other columns are dependent on them
+    Call PublicSubs.VLOOKUP("Fed Taxable Inc","B",2) 'employee number
+    Call PublicSubs.VLOOKUP("Fed Taxable Inc","X",7) 'voucher/check number
 
-
+    'Function arguments are: tab to lookup from, main tab's column, src's column
     Call PublicSubs.LookupByEEandCK("Add and WH", "C",2)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","D",4)
+        Columns("D").NumberFormat = "yyyy-mm-dd"
     Call PublicSubs.LookupByEE("Cost Centers","F",4)
     Call PublicSubs.LookupByEE("Cost Centers","G",3)
     Call PublicSubs.LookupByEEandCK("Add and WH", "J",5)
@@ -62,14 +61,14 @@ Sub ConsolidateSheets()
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","L",9)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","N",10)
     Call PublicSubs.LookupByEEandCK("Add and WH", "P",3)
+        Columns("P").NumberFormat = "yyyy-mm-dd"
     Call PublicSubs.LookupByEEandCK("Add and WH", "Q",4)
+        Columns("Q").NumberFormat = "yyyy-mm-dd"
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","R",5)
     Call PublicSubs.VLOOKUP("Fed Taxable Inc","T",11)
     Call PublicSubs.LookupByEEandCK("Add and WH", "U",10)
     Range("W2:W" & LastRow).Formula = "=($N2<0)"
     Call PublicSubs.LookupByEE("Cost Centers","Y",5)
-
-
 End Sub
 
 Sub ImportRawData()
