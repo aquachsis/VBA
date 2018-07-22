@@ -16,6 +16,14 @@ Public Sub CopyToSheet (SheetName)
     Workbooks(RawDataWbName).Worksheets(1).Range("A1:AM" & LastRow).Value
 End Sub
 
+Public Sub CreateUID2 (UIDFormula)
+    LastRow = PublicFunctions.FindLastRow(1)
+    Range("A1").EntireColumn.Insert
+    Range("A1").Value = "UID"
+    Range("A2:A" & LastRow).FormulaR1C1 = UIDFormula
+    Range("A2:A" & LastRow).Value = Range("A2:A" & LastRow).Value
+End Sub
+
 Public Sub CreateUID (UIDFormula)
     Workbooks(MainWbName).Worksheets(RawDataWksName).Activate
     LastRow = PublicFunctions.FindLastRow(1)

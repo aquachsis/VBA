@@ -8,16 +8,11 @@ Public CodeColumn As Long
 Public DestRowNum As Long
 Public FirstRow As Long
 Public FirstColumn As Long
+
 Sub Deductions()
     Call ImportRawData.ImportRawData("Deductions/Expenses")
-
-'##### Create UID TODO make into a function
-    LastRow = PublicFunctions.FindLastRow(1)
-    Range("A1").EntireColumn.Insert
-    Range("A1").Value = "UID"
-    Range("A2:A" & LastRow).FormulaR1C1 = "=TEXTJOIN(""|"",FALSE,RC[3]:RC[6])"
-    Range("A2:A" & LastRow).Value = Range("A2:A" & LastRow).Value
-    Columns("B:G").Delete
+    Call PublicSubs.CreateUID2("=TEXTJOIN(""|"",FALSE,RC[3]:RC[6])")
+    Columns("B:G").Delete 'TODO might be able to add to CreateUID2'
 
 '##### Defines source array size and set constants.
     FirstRow = 1
@@ -25,7 +20,6 @@ Sub Deductions()
     LastRow = PublicFunctions.FindLastRow(1) 'Uncessary, but makes block clear?
     LastColumn = PublicFunctions.FindLastColumn
     SrcArray = Range(Cells(FirstRow,FirstColumn), Cells(LastRow, LastColumn))
-
     CodeColumn = 2
 
 '##### Create deduction sheet from source file.
@@ -36,7 +30,7 @@ Sub Deductions()
         Else
         End If
     Next RowNum
-    Workbooks(MainWbName).Worksheets("Deductions").Range("A1").Resize(UBound(DestArray), 3) = DestArray
+    Workbooks(MainWbName).Worksheets("Deductions").Range("A1").Resize(UBound(DestArray), LastColumn) = DestArray
 
 '##### Create expense sheet from source file.
     Call CreateSheetAndEmptyArray("Expenses")
@@ -46,42 +40,66 @@ Sub Deductions()
         Else
         End If
     Next RowNum
-    Workbooks(MainWbName).Worksheets("Expenses").Range("A1").Resize(UBound(DestArray), 3) = DestArray
+    Workbooks(MainWbName).Worksheets("Expenses").Range("A1").Resize(UBound(DestArray), LastColumn) = DestArray
 
-'##### Close the source file.
-    Workbooks(RawDataWbName).Close SaveChanges:=False
+    Workbooks(RawDataWbName).Close SaveChanges:=False 'close source file
 End Sub
 
 Sub Earnings()
     Call ImportRawData.ImportRawData("Earnings/Memos")
+    Call PublicSubs.CreateUID2("=TEXTJOIN(""|"",FALSE,RC[3]:RC[6])")
+    Columns("B:G").Delete 'TODO might be able to add to CreateUID2'
 
-    'Copy deductions.
-    Workbooks(RawDataWbName).Worksheets(1).Activate
-    Range("A:H").AutoFilter _
-        Field:=7, _
-        Criteria1:="<>Memo"
-    RawDataWksName = "Earnings"
-    Call PublicSubs.CopyToSheet(RawDataWksName)
-    Call PublicSubs.CreateUID("=TEXTJOIN(""|"",FALSE,RC[3]:RC[6])")
+'##### Defines source array size and set constants.
+    FirstRow = 1
+    FirstColumn = 1
+    LastRow = PublicFunctions.FindLastRow(1) 'Uncessary, but makes block clear?
+    LastColumn = PublicFunctions.FindLastColumn
+    SrcArray = Range(Cells(FirstRow,FirstColumn), Cells(LastRow, LastColumn))
+    CodeColumn = 2
 
-    'Copy expenses.
-    Workbooks(RawDataWbName).Worksheets(1).Activate
-    Range("A:H").AutoFilter _
-        Field:=7, _
-        Criteria1:="Memo"
-    RawDataWksName = "Memos"
-    Call PublicSubs.CopyToSheet(RawDataWksName)
-    Call PublicSubs.CreateUID("=TEXTJOIN(""|"",FALSE,RC[3]:RC[6])")
+'##### Create earnings sheet from source file.
+    Call CreateSheetAndEmptyArray("Earnings")
+    For RowNum = 1 To UBound(SrcArray)
+        If SrcArray(RowNum, CodeColumn) <> "Memo" OR RowNum = 1 Then
+            Call CreateNewArray()
+        Else
+        End If
+    Next RowNum
+    Workbooks(MainWbName).Worksheets("Earnings").Range("A1").Resize(UBound(DestArray), LastColumn) = DestArray
 
-    Workbooks(RawDataWbName).Close SaveChanges:=False
+'##### Create memos sheet from source file.
+    Call CreateSheetAndEmptyArray("Memos")
+    For RowNum = 1 To UBound(SrcArray)
+        If SrcArray(RowNum, CodeColumn) = "Memo" OR RowNum = 1 Then
+            Call CreateNewArray()
+        Else
+        End If
+    Next RowNum
+    Workbooks(MainWbName).Worksheets("Memos").Range("A1").Resize(UBound(DestArray), LastColumn) = DestArray
+
+    Workbooks(RawDataWbName).Close SaveChanges:=False 'close source file
 End Sub
 
 Sub Taxes()
     Call ImportRawData.ImportRawData("Taxes")
-    Workbooks(RawDataWbName).Worksheets(1).Activate
-    RawDataWksName = "Taxes"
-    Call PublicSubs.CopyToSheet(RawDataWksName)
-    Call PublicSubs.CreateUID("=TEXTJOIN(""|"",FALSE,RC[3]:RC[6])")
+    Call PublicSubs.CreateUID2("=TEXTJOIN(""|"",FALSE,RC[3]:RC[6])")
+    Columns("B:G").Delete 'TODO might be able to add to CreateUID2'
 
-    Workbooks(RawDataWbName).Close SaveChanges:=False
+'##### Defines source array size and set constants.
+    FirstRow = 1
+    FirstColumn = 1
+    LastRow = PublicFunctions.FindLastRow(1) 'Uncessary, but makes block clear?
+    LastColumn = PublicFunctions.FindLastColumn
+    SrcArray = Range(Cells(FirstRow,FirstColumn), Cells(LastRow, LastColumn))
+    CodeColumn = 2
+
+'##### Create memos sheet from source file.
+    Call CreateSheetAndEmptyArray("Taxes")
+    For RowNum = 1 To UBound(SrcArray)
+        Call CreateNewArray()
+    Next RowNum
+    Workbooks(MainWbName).Worksheets("Taxes").Range("A1").Resize(UBound(DestArray), LastColumn) = DestArray
+
+    Workbooks(RawDataWbName).Close SaveChanges:=False 'close source file
 End Sub
