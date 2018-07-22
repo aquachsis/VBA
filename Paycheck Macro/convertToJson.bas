@@ -23,9 +23,13 @@ Sub Notes()
 'http://excelerator.solutions/2017/08/24/convert-excel-to-json-using-vba/
 'https://github.com/VBA-tools/VBA-Dictionary
 'https://github.com/VBA-tools/VBA-JSON'
+
 'TODO what if there are multiple of same code for the same UID? e.g. one UID has 2 ORCAs
+'TODO earnings can have two XRG with two different rates, how to handle?
 'TODO expenses probably doesn't need to be nested since it's just one expense amount
+
 End Sub
+
 'TODO set columns as parameters, reusability'
 Sub addToDict()
     Dim amountColumn As Long

@@ -26,12 +26,16 @@ Public Sub CreateUID (UIDFormula)
 End Sub
 
 Public Sub Unformat()
-    'Show Gridlines
     ActiveWindow.DisplayGridlines = True
-    'Unfilter
     ActiveSheet.AutoFilterMode = False
-    'Unmerge
     ActiveSheet.Cells.UnMerge
+End Sub
+
+Public Sub CreateNewArray()
+    For ColNum = 1 To LastColumn
+        DestArray(DestRowNum, ColNum) = SrcArray(RowNum, ColNum)
+    Next ColNum
+    DestRowNum = DestRowNum + 1
 End Sub
 
 Public Sub InsertFormula(Header, ColumnLetter, Formula)
