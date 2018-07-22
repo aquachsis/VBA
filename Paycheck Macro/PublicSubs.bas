@@ -1,4 +1,4 @@
-Attribute VB_Name = "PublicSubs"
+'Attribute VB_Name = "PublicSubs" TODO add back later
 
 Public Sub FirstRowDelete()
     Do While IsEmpty(Cells(1,1).Value)
@@ -29,6 +29,14 @@ Public Sub Unformat()
     ActiveWindow.DisplayGridlines = True
     ActiveSheet.AutoFilterMode = False
     ActiveSheet.Cells.UnMerge
+End Sub
+
+Public Sub CreateSheetAndEmptyArray(SheetName)
+    Erase DestArray
+    Workbooks(MainWbName).Sheets.Add.Name = SheetName
+    Workbooks(MainWbName).Worksheets(SheetName).Activate
+    DestArray = Range(Cells(FirstRow,FirstColumn), Cells(LastRow, LastColumn))
+    DestRowNum = 1
 End Sub
 
 Public Sub CreateNewArray()
