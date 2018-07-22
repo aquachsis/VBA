@@ -34,7 +34,7 @@ Sub Deductions()
     DestRowNum = 1
 
     For RowNum = 1 To UBound(SrcArray)
-        If SrcArray(RowNum, CodeColumn) <> "EXP" then
+        If SrcArray(RowNum, CodeColumn) <> "EXP" OR RowNum = 1 Then
             Call CreateNewArray()
         Else
         End If
@@ -49,7 +49,7 @@ Sub Deductions()
     DestArray = Range("A1:C" & LastRow)
     DestRowNum = 1
     For RowNum = 1 To UBound(SrcArray)
-        If SrcArray(RowNum, CodeColumn) = "EXP" then
+        If SrcArray(RowNum, CodeColumn) = "EXP" Or RowNum = 1 Then
             Call CreateNewArray()
         Else
         End If
